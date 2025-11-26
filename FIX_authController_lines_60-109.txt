@@ -1,0 +1,55 @@
+// CORRECTED LINES 60-109 for authController.js
+// Replace from line 60 onwards in the register function
+
+        avatar_url || null
+      ]
+    );
+
+    const userId = result.insertId;
+
+    // Send OTP for both phone and email registrations
+    const identifier = email || phone_number;
+    const otp = generateOtp();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    await pool.execute(
+      'INSERT INTO otp_codes (identifier, code, type, expires_at) VALUES (?, ?, ?, ?)',
+      [identifier.trim(), otp, 'registration', expiresAt]
+    );
+
+    // Send OTP via appropriate channel
+    try {
+      if (phone_number) {
+        await smsService.sendOtp(phone_number.trim(), otp);
+      } else if (email) {
+        await emailService.sendOtpEmail(email.toLowerCase().trim(), otp, full_name);
+      }
+    } catch (error) {
+      console.error('Failed to send OTP:', error);
+      // Continue anyway - user can resend
+    }
+
+    // Generate JWT Token
+    const payload = { userId };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN || '1d',
+    });
+
+    // Fetch and Return User Data
+    const [users] = await pool.execute(
+      'SELECT id, full_name, email, phone_number, role, subscription_plan, is_phone_verified, created_at FROM users WHERE id = ?',
+      [userId]
+    );
+
+    res.status(201).json({
+      message: 'User registered successfully. Please verify your account.',
+      token,
+      user: users[0],
+      requiresVerification: true // Always require verification now
+    });
+
+  } catch (error) {
+    console.error('Registration Error:', error);
+    res.status(500).json({ message: 'An internal server error occurred during registration.' });
+  }
+};

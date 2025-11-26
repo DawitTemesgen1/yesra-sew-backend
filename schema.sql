@@ -1,0 +1,102 @@
+-- -- Create database
+-- CREATE DATABASE IF NOT EXISTS yesirasew_db;
+-- USE yesirasew_db;
+
+-- -- Users table
+-- CREATE TABLE users (
+--   id INT PRIMARY KEY AUTO_INCREMENT,
+--   full_name VARCHAR(255) NOT NULL,
+--   email VARCHAR(255) UNIQUE NOT NULL,
+--   password VARCHAR(255) NOT NULL,
+--   role ENUM('user', 'company', 'admin') DEFAULT 'user',
+--   subscription_plan ENUM('Free', 'Standard', 'Premium') DEFAULT 'Free',
+--   is_banned BOOLEAN DEFAULT FALSE,
+--   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+-- );
+
+-- -- Categories table
+-- CREATE TABLE categories (
+--   id INT PRIMARY KEY AUTO_INCREMENT,
+--   name VARCHAR(255) NOT NULL,
+--   slug VARCHAR(255) UNIQUE NOT NULL,
+--   description TEXT,
+--   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+-- );
+
+-- -- Listings table
+-- CREATE TABLE listings (
+--   id INT PRIMARY KEY AUTO_INCREMENT,
+--   title VARCHAR(255) NOT NULL,
+--   description TEXT NOT NULL,
+--   price DECIMAL(15,2),
+--   location VARCHAR(255) NOT NULL,
+--   category_id INT,
+--   type ENUM('For Sale', 'For Rent', 'Full-time', 'Part-time', 'Tender') NOT NULL,
+--   author_id INT NOT NULL,
+--   status ENUM('pending', 'approved', 'rejected') DEFAULT 'pending',
+--   images JSON,
+--   bedrooms INT,
+--   bathrooms INT,
+--   area_sqft INT,
+--   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+--   FOREIGN KEY (category_id) REFERENCES categories(id),
+--   FOREIGN KEY (author_id) REFERENCES users(id) ON DELETE CASCADE
+-- );
+
+-- -- Favorites table
+-- CREATE TABLE favorites (
+--   id INT PRIMARY KEY AUTO_INCREMENT,
+--   user_id INT NOT NULL,
+--   listing_id INT NOT NULL,
+--   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+--   FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE,
+--   UNIQUE KEY unique_favorite (user_id, listing_id)
+-- );
+
+-- -- Applications table
+-- CREATE TABLE applications (
+--   id INT PRIMARY KEY AUTO_INCREMENT,
+--   user_id INT NOT NULL,
+--   listing_id INT NOT NULL,
+--   message TEXT,
+--   status ENUM('Submitted', 'Viewed', 'Rejected', 'Accepted') DEFAULT 'Submitted',
+--   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--   FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+--   FOREIGN KEY (listing_id) REFERENCES listings(id) ON DELETE CASCADE
+-- );
+
+-- -- Chat conversations table
+-- CREATE TABLE chat_conversations (
+--   id INT PRIMARY KEY AUTO_INCREMENT,
+--   participant1_id INT NOT NULL,
+--   participant2_id INT NOT NULL,
+--   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--   FOREIGN KEY (participant1_id) REFERENCES users(id) ON DELETE CASCADE,
+--   FOREIGN KEY (participant2_id) REFERENCES users(id) ON DELETE CASCADE
+-- );
+
+-- -- Chat messages table
+-- CREATE TABLE chat_messages (
+--   id INT PRIMARY KEY AUTO_INCREMENT,
+--   conversation_id INT NOT NULL,
+--   sender_id INT NOT NULL,
+--   message TEXT NOT NULL,
+--   is_read BOOLEAN DEFAULT FALSE,
+--   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+--   FOREIGN KEY (conversation_id) REFERENCES chat_conversations(id) ON DELETE CASCADE,
+--   FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+-- );
+
+-- -- Insert default categories
+-- INSERT INTO categories (name, slug, description) VALUES
+-- ('Jobs', 'jobs', 'Employment opportunities'),
+-- ('Tenders', 'tenders', 'Business tenders and contracts'),
+-- ('Homes', 'homes', 'Properties for sale and rent'),
+-- ('Cars', 'cars', 'Vehicles for sale');
+
+-- -- Insert admin user (password: admin123)
+-- INSERT INTO users (full_name, email, password, role, subscription_plan) 
+-- VALUES ('Platform Admin', 'admin@yesrasew.com', '$2a$10$8K1p/a0dR1C1C.6C5D5D5e5D5D5D5D5D5D5D5D5D5D5D5D5D5D5D5D5D5', 'admin', 'Premium');

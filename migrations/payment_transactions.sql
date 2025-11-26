@@ -1,0 +1,25 @@
+-- Create payment_transactions table for tracking all payments
+CREATE TABLE IF NOT EXISTS payment_transactions (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  tx_ref VARCHAR(100) UNIQUE NOT NULL,
+  user_id INT NOT NULL,
+  plan_name ENUM('Standard', 'Premium') NOT NULL,
+  amount DECIMAL(10,2) NOT NULL,
+  currency VARCHAR(3) DEFAULT 'ETB',
+  status ENUM('pending', 'processing', 'completed', 'failed', 'cancelled') DEFAULT 'pending',
+  chapa_reference VARCHAR(100),
+  payment_method VARCHAR(50),
+  email VARCHAR(255),
+  first_name VARCHAR(100),
+  last_name VARCHAR(100),
+  error_message TEXT,
+  metadata JSON,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  completed_at TIMESTAMP NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  INDEX idx_tx_ref (tx_ref),
+  INDEX idx_user_id (user_id),
+  INDEX idx_status (status),
+  INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -1,0 +1,26 @@
+-- Add missing columns to listings table one by one
+ALTER TABLE listings ADD COLUMN city VARCHAR(255);
+ALTER TABLE listings ADD COLUMN subcity VARCHAR(255);
+ALTER TABLE listings ADD COLUMN specific_location VARCHAR(255);
+ALTER TABLE listings ADD COLUMN make VARCHAR(255);
+ALTER TABLE listings ADD COLUMN model VARCHAR(255);
+ALTER TABLE listings ADD COLUMN year INT;
+ALTER TABLE listings ADD COLUMN transmission VARCHAR(50);
+ALTER TABLE listings ADD COLUMN fuel_type VARCHAR(50);
+ALTER TABLE listings ADD COLUMN mileage INT;
+ALTER TABLE listings ADD COLUMN `condition` VARCHAR(50);
+ALTER TABLE listings ADD COLUMN car_status VARCHAR(50);
+ALTER TABLE listings ADD COLUMN experience_level VARCHAR(100);
+ALTER TABLE listings ADD COLUMN education_level VARCHAR(100);
+ALTER TABLE listings ADD COLUMN deadline DATE;
+ALTER TABLE listings ADD COLUMN job_location_type VARCHAR(50);
+ALTER TABLE listings ADD COLUMN responsibilities TEXT;
+ALTER TABLE listings ADD COLUMN requirements TEXT;
+ALTER TABLE listings ADD COLUMN salary_type VARCHAR(50);
+ALTER TABLE listings ADD COLUMN tender_type VARCHAR(50);
+ALTER TABLE listings ADD COLUMN tender_category VARCHAR(100);
+ALTER TABLE listings ADD COLUMN payment_method VARCHAR(50);
+ALTER TABLE listings ADD COLUMN bank_payment_style VARCHAR(50);
+ALTER TABLE listings ADD COLUMN property_type VARCHAR(50);
+ALTER TABLE listings ADD COLUMN furnishing VARCHAR(50);
+ALTER TABLE listings ADD COLUMN specific_home_type VARCHAR(100);

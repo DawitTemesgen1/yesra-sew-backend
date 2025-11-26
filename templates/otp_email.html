@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Code</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .greeting {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .message {
+            font-size: 16px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .otp-box {
+            background: #f8f9fa;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 25px;
+            text-align: center;
+            margin: 30px 0;
+        }
+        .otp-code {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+            letter-spacing: 8px;
+            font-family: 'Courier New', monospace;
+        }
+        .validity {
+            font-size: 14px;
+            color: #999;
+            margin-top: 15px;
+        }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #856404;
+        }
+        .footer {
+            background: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 14px;
+            color: #999;
+            border-top: 1px solid #e9ecef;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <h1>የስራ ሰው</h1>
+            <p>YesraSew - Your Gateway to Opportunities</p>
+        </div>
+        
+        <div class="content">
+            <div class="greeting">Hello {{name}},</div>
+            
+            <div class="message">
+                Thank you for signing up with YesraSew! To complete your registration and verify your email address, please use the verification code below:
+            </div>
+            
+            <div class="otp-box">
+                <div class="otp-code">{{otp}}</div>
+                <div class="validity">This code will expire in 10 minutes</div>
+            </div>
+            
+            <div class="message">
+                Enter this code in the app to verify your account and start exploring amazing opportunities in Ethiopia.
+            </div>
+            
+            <div class="warning">
+                <strong>Security Notice:</strong> If you didn't request this code, please ignore this email. Never share your verification code with anyone.
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2025 YesraSew. All rights reserved.</p>
+            <p>
+                <a href="https://yesrasew.com">Visit Website</a> | 
+                <a href="mailto:support@yesrasew.com">Contact Support</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

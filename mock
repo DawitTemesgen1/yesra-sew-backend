@@ -1,0 +1,35 @@
+-- Add this to your database setup script (after creating tables)
+-- Insert test categories
+INSERT INTO categories (name, slug, description) VALUES
+('Jobs', 'jobs', 'Employment opportunities'),
+('Tenders', 'tenders', 'Business tenders and contracts'),
+('Homes', 'homes', 'Properties for sale and rent'),
+('Cars', 'cars', 'Vehicles for sale');
+
+-- Insert test users (passwords are 'password123' hashed)
+INSERT INTO users (full_name, email, password, role, subscription_plan) VALUES
+('Platform Admin', 'admin@yesirasew.com', '$2a$10$8K1p/a0dR1C1C.6C5D5D5e5D5D5D5D5D5D5D5D5D5D5D5D5D5D5D5D5D5', 'admin', 'Premium'),
+('Ethio Solutions PLC', 'company@yesirasew.com', '$2a$10$8K1p/a0dR1C1C.6C5D5D5e5D5D5D5D5D5D5D5D5D5D5D5D5D5D5D5D5', 'company', 'Premium'),
+('Test User', 'test@user.com', '$2a$10$8K1p/a0dR1C1C.6C5D5D5e5D5D5D5D5D5D5D5D5D5D5D5D5D5D5D5D5', 'user', 'Free');
+
+-- Insert test listings
+INSERT INTO listings (title, description, price, location, category_id, type, author_id, status, images) VALUES
+('Luxury Villa with Ocean View', 'A beautiful 4-bedroom villa with stunning ocean views and modern amenities. Perfect for families looking for luxury living in the heart of Bole.', '25000000', 'Bole, Addis Ababa', 3, 'For Sale', 2, 'approved', '["https://images.unsplash.com/photo-1580587771525-78b9dba3b914?q=80&w=800&auto=format&fit=crop"]'),
+('Senior Flutter Developer', 'We are looking for an experienced Flutter Developer to join our innovative tech team. Must have 3+ years of experience in mobile development.', 'Competitive Salary', 'Remote (Ethiopia)', 1, 'Full-time', 2, 'approved', '["https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=800&auto=format&fit=crop"]'),
+('Slightly Used Toyota Vitz 2018', 'Clean, well-maintained Toyota Vitz with only 45,000 km. Regular service history, no accidents, excellent condition.', '1800000', 'CMC, Addis Ababa', 4, 'For Sale', 3, 'pending', '["https://images.unsplash.com/photo-1552519507-da3b142c6e3d?q=80&w=800&auto=format&fit=crop"]'),
+('Government Construction Tender', 'Large-scale construction project for new government administrative building. Bidding open to qualified construction companies.', '50000000', 'Addis Ababa', 2, 'Government', 1, 'approved', '["https://images.unsplash.com/photo-1589998059171-988d887df646?q=80&w=500&auto=format&fit=crop"]'),
+('Modern 2 Bedroom Apartment', 'Spacious 2 bedroom apartment in prime location. Features modern kitchen, balcony, and secure parking. Available immediately.', '8000', 'Bole, Addis Ababa', 3, 'For Rent', 3, 'approved', '["https://images.unsplash.com/photo-1564013799919-ab600027ffc6?q=80&w=2070&auto=format&fit=crop"]'),
+('Lead UI/UX Designer', 'Join our creative team as a Lead UI/UX Designer. Remote work available with competitive compensation package.', 'Negotiable', 'Addis Ababa', 1, 'Full-time', 2, 'approved', '["https://images.unsplash.com/photo-1561070791-2526d30994b5?q=80&w=800&auto=format&fit=crop"]'),
+('Solar Energy Project Tender', 'International tender for solar energy installation project. Renewable energy company preferred with proven track record.', '75000000', 'Various Locations', 2, 'International', 1, 'approved', '["https://images.unsplash.com/photo-1466611653911-95081537e5b7?q=80&w=500&auto=format&fit=crop"]'),
+('Toyota Land Cruiser 2022', 'Brand new Toyota Land Cruiser 2022 model. Zero mileage, full options, available for immediate purchase.', '8500000', 'Bole, Addis Ababa', 4, 'For Sale', 2, 'approved', '["https://images.unsplash.com/photo-1583121274602-3e2820c69888?q=80&w=800&auto=format&fit=crop"]');
+
+-- Insert test favorites
+INSERT INTO favorites (user_id, listing_id) VALUES
+(3, 1),
+(3, 2),
+(3, 5);
+
+-- Insert test applications
+INSERT INTO applications (user_id, listing_id, message, status) VALUES
+(3, 2, 'I am very interested in this position and believe my skills match your requirements perfectly.', 'Submitted'),
+(3, 6, 'I have 5 years of experience in UI/UX design and would love to join your team.', 'Viewed');
