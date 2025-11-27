@@ -6,7 +6,7 @@ const {
     getPaymentStatus,
     getPaymentHistory
 } = require('../controllers/paymentController');
-const { auth } = require('../middleware/auth');
+const { auth, adminAuth } = require('../middleware/auth');
 
 const router = express.Router();
 
@@ -19,6 +19,9 @@ router.use(auth);
 router.post('/initialize', initializePayment);
 router.post('/verify/:txRef', verifyPayment);
 router.get('/status/:txRef', getPaymentStatus);
+
+// Admin-only payment routes
+router.use(adminAuth);
 router.get('/history', getPaymentHistory);
 
 module.exports = router;

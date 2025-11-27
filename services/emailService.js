@@ -46,6 +46,11 @@ const renderTemplate = async (templateName, variables) => {
  */
 const sendOtpEmail = async (email, otp, name = 'User') => {
     try {
+        // Log OTP for development/testing since email might fail with placeholder creds
+        console.log('=================================================');
+        console.log(`[DEV] OTP for ${email}: ${otp}`);
+        console.log('=================================================');
+
         const html = await renderTemplate('otp_email', { name, otp });
         const plainText = `Hello ${name},\n\nYour verification code is: ${otp}\n\nThis code will expire in 10 minutes.\n\nIf you didn't request this code, please ignore this email.\n\nBest regards,\nYesraSew Team`;
 
@@ -61,6 +66,9 @@ const sendOtpEmail = async (email, otp, name = 'User') => {
         return info;
     } catch (error) {
         console.error('Error sending OTP email:', error);
+        // In development, we might want to suppress this error if we just want to test the flow
+        // But for now, let's rethrow it so the controller knows, 
+        // BUT the controller catches it and continues anyway.
         throw error;
     }
 };

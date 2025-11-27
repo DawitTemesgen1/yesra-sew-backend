@@ -37,7 +37,6 @@ const auth = async (req, res, next) => {
     }
   } else {
     // This block runs if no 'Authorization' header is found.
-    // This is what will fix your timeout issue.
     res.status(401).json({ message: 'Authorization denied: No token provided.' });
   }
 };
@@ -48,12 +47,16 @@ const adminAuth = (req, res, next) => {
   auth(req, res, () => {
     // This part only runs if the 'auth' middleware was successful and called next()
 
-    // Now, check if the authenticated user has the 'admin' role
-    if (req.user && req.user.role === 'admin') {
-      // If user is an admin, proceed to the admin-specific route
+    // FIX: Check for 'SuperAdmin' (matches your DB) OR 'admin' OR 'Moderator'
+    // This allows both your new SuperAdmin role and legacy 'admin' roles to work.
+    const allowedRoles = ['SuperAdmin', 'admin', 'Moderator'];
+
+    if (req.user && allowedRoles.includes(req.user.role)) {
+      // If user is an admin/superadmin, proceed to the admin-specific route
       next();
     } else {
       // If user is not an admin, send a Forbidden error
+      console.log(`Access denied for user role: ${req.user.role}`); // Debug log
       res.status(403).json({ message: 'Access denied: Admin rights required.' });
     }
   });

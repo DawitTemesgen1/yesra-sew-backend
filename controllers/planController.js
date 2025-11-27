@@ -3,52 +3,103 @@ const pool = require('../config/database');
 /**
  * @desc    Get all available subscription plans
  * @route   GET /api/plans
- * @access  Admin
+ * @access  Public
  */
-const getPlans = (req, res) => {
-    try {
-        // In a real production app, plans would be stored in a database table.
-        // For this project, we manage them via environment variables for simplicity.
-        const plans = [
-            {
-                title: 'Free',
-                price: 'ETB 0 / month',
-                features: 'Post 1 ad per month, Basic visibility, Standard support',
-            },
-            {
-                title: 'Standard',
-                price: `ETB ${process.env.STANDARD_PLAN_PRICE || '100'} / month`,
-                features: 'Post 10 ads, Featured priority, Chat access',
-            },
-            {
-                title: 'Premium',
-                price: `ETB ${process.env.PREMIUM_PLAN_PRICE || '200'} / month`,
-                features: 'Unlimited posts, Top placement, 24/7 support',
-            },
-        ];
-        res.json(plans);
-    } catch (error) {
-        console.error('Error fetching plans:', error);
-        res.status(500).json({ message: 'Server Error while fetching plans' });
-    }
+const getPlans = async (req, res) => {
+  try {
+    const [plans] = await pool.execute(
+      'SELECT id, name, description, price, listing_limit, can_feature_posts FROM plans ORDER BY price ASC'
+    );
+    res.json(plans);
+  } catch (error) {
+    console.error('Error fetching plans:', error);
+    res.status(500).json({ message: 'Server Error while fetching plans' });
+  }
 };
 
 /**
- * @desc    Update a subscription plan (Placeholder)
- * @route   PUT /api/plans/:planName
+ * @desc    Create a new subscription plan
+ * @route   POST /api/plans
  * @access  Admin
  */
-const updatePlan = (req, res) => {
-    // NOTE: Updating .env files at runtime is not a standard or safe practice.
-    // A production-grade implementation would involve a 'plans' table in the database
-    // and this controller would update that table.
-    // For now, we return a "Not Implemented" status.
-    res.status(501).json({ 
-        message: 'Updating plans via API is not implemented. To change plan prices or features, please edit the .env file and restart the server.' 
-    });
+const createPlan = async (req, res) => {
+  try {
+    const { name, description, price, listing_limit, can_feature_posts } = req.body;
+
+    if (!name || !description || price == null || listing_limit == null || can_feature_posts == null) {
+      return res.status(400).json({ message: 'All plan fields are required' });
+    }
+
+    const [result] = await pool.execute(
+      'INSERT INTO plans (name, description, price, listing_limit, can_feature_posts) VALUES (?, ?, ?, ?, ?)',
+      [name, description, price, listing_limit, can_feature_posts]
+    );
+
+    res.status(201).json({ id: result.insertId, name, description, price, listing_limit, can_feature_posts });
+  } catch (error) {
+    console.error('Error creating plan:', error);
+    res.status(500).json({ message: 'Server Error while creating plan' });
+  }
 };
 
-module.exports = { 
-    getPlans, 
-    updatePlan 
+/**
+ * @desc    Update an existing subscription plan
+ * @route   PUT /api/plans/:id
+ * @access  Admin
+ */
+const updatePlan = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, price, listing_limit, can_feature_posts } = req.body;
+
+    if (!name || !description || price == null || listing_limit == null || can_feature_posts == null) {
+      return res.status(400).json({ message: 'All plan fields are required' });
+    }
+
+    const [result] = await pool.execute(
+      'UPDATE plans SET name = ?, description = ?, price = ?, listing_limit = ?, can_feature_posts = ? WHERE id = ?',
+      [name, description, price, listing_limit, can_feature_posts, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Plan not found' });
+    }
+
+    res.json({ id, name, description, price, listing_limit, can_feature_posts });
+  } catch (error) {
+    console.error('Error updating plan:', error);
+    res.status(500).json({ message: 'Server Error while updating plan' });
+  }
+};
+
+/**
+ * @desc    Delete a subscription plan
+ * @route   DELETE /api/plans/:id
+ * @access  Admin
+ */
+const deletePlan = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [result] = await pool.execute(
+      'DELETE FROM plans WHERE id = ?',
+      [id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Plan not found' });
+    }
+
+    res.status(204).send(); // No content for successful deletion
+  } catch (error) {
+    console.error('Error deleting plan:', error);
+    res.status(500).json({ message: 'Server Error while deleting plan' });
+  }
+};
+
+module.exports = {
+  getPlans,
+  createPlan,
+  updatePlan,
+  deletePlan,
 };

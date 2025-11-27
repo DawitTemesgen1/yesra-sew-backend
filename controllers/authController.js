@@ -128,6 +128,67 @@ const register = async (req, res) => {
 };
 
 /**
+ * @desc    Verify OTP
+ * @route   POST /api/auth/verify-otp
+ * @access  Public
+ */
+const verifyOtp = async (req, res) => {
+    try {
+        const { email, phone_number, code } = req.body;
+        const identifier = email || phone_number;
+
+        if (!identifier || !code) {
+            return res.status(400).json({ message: 'Please provide email/phone and code.' });
+        }
+
+        const isEmail = identifier.includes('@');
+
+        // Check OTP
+        const [otps] = await pool.execute(
+            'SELECT * FROM otp_codes WHERE identifier = ? AND code = ? AND type = ? AND expires_at > NOW() ORDER BY created_at DESC LIMIT 1',
+            [isEmail ? identifier.toLowerCase().trim() : identifier.trim(), code.trim(), 'registration']
+        );
+
+        if (otps.length === 0) {
+            return res.status(400).json({ message: 'Invalid or expired OTP.' });
+        }
+
+        // Mark user as verified (only for phone for now as per schema)
+        if (!isEmail) {
+            await pool.execute(
+                'UPDATE users SET is_phone_verified = TRUE WHERE phone_number = ?',
+                [identifier.trim()]
+            );
+        }
+
+        // Delete used OTP
+        await pool.execute('DELETE FROM otp_codes WHERE id = ?', [otps[0].id]);
+
+        // Get user to return token
+        let query = 'SELECT id, full_name, email, phone_number, role, subscription_plan, is_phone_verified, account_type, is_verified FROM users WHERE ';
+        if (isEmail) {
+            query += 'email = ?';
+        } else {
+            query += 'phone_number = ?';
+        }
+
+        const [users] = await pool.execute(query, [isEmail ? identifier.toLowerCase().trim() : identifier.trim()]);
+
+        if (users.length === 0) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const user = users[0];
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+            expiresIn: process.env.JWT_EXPIRES_IN || '1d',
+        });
+
+        // Send welcome email if this was email registration
+        if (user.email) {
+            try {
+                await emailService.sendWelcomeEmail(user.email, user.full_name);
+            } catch (error) {
+                console.error('Failed to send welcome email:', error);
                 // Don't fail verification if welcome email fails
             }
         }
@@ -151,21 +212,29 @@ const register = async (req, res) => {
  */
 const resendOtp = async (req, res) => {
     try {
-        const { phone_number } = req.body;
+        const { email, phone_number } = req.body;
+        const identifier = email || phone_number;
 
-        if (!phone_number) {
-            return res.status(400).json({ message: 'Please provide phone number.' });
+        if (!identifier) {
+            return res.status(400).json({ message: 'Please provide email or phone number.' });
         }
 
+        const isEmail = identifier.includes('@');
         const otp = generateOtp();
         const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
         await pool.execute(
             'INSERT INTO otp_codes (identifier, code, type, expires_at) VALUES (?, ?, ?, ?)',
-            [phone_number.trim(), otp, 'registration', expiresAt]
+            [isEmail ? identifier.toLowerCase().trim() : identifier.trim(), otp, 'registration', expiresAt]
         );
 
-        await smsService.sendOtp(phone_number.trim(), otp);
+        if (isEmail) {
+            const [users] = await pool.execute('SELECT full_name FROM users WHERE email = ?', [identifier.toLowerCase().trim()]);
+            const name = users.length > 0 ? users[0].full_name : 'User';
+            await emailService.sendOtpEmail(identifier.toLowerCase().trim(), otp, name);
+        } else {
+            await smsService.sendOtp(identifier.trim(), otp);
+        }
 
         res.status(200).json({ message: 'OTP resent successfully.' });
 
@@ -182,7 +251,13 @@ const resendOtp = async (req, res) => {
  */
 const login = async (req, res) => {
     try {
-        const { email, phone_number, password } = req.body;
+        let { email, phone_number, password } = req.body;
+
+        // Auto-detect if 'email' field actually contains a phone number
+        if (email && !email.includes('@')) {
+            phone_number = email;
+            email = null;
+        }
 
         if ((!email && !phone_number) || !password) {
             return res.status(400).json({ message: 'Please provide email/phone and password.' });

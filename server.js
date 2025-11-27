@@ -14,9 +14,13 @@ const chatRoutes = require('./routes/chat');
 const verificationRoutes = require('./routes/verification');
 const companyRoutes = require('./routes/companies');
 const adminRoutes = require('./routes/admin');
-const planRoutes = require('./routes/plans'); // New route
-const paymentRoutes = require('./routes/payments'); // New route
-const notificationRoutes = require('./routes/notifications'); // New route
+const planRoutes = require('./routes/plans');
+const paymentRoutes = require('./routes/payments');
+const notificationRoutes = require('./routes/notifications');
+const locationRoutes = require('./routes/locations');
+const announcementRoutes = require('./routes/announcements');
+const emailTemplateRoutes = require('./routes/emailTemplates');
+const systemConfigRoutes = require('./routes/systemConfig');
 
 const app = express();
 
@@ -46,11 +50,14 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/chat', chatRoutes);
 app.use('/api/verification', verificationRoutes);
 app.use('/api/companies', companyRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/plans', planRoutes); // New route
-app.use('/api/payments', paymentRoutes); // New route
-app.use('/api/notifications', notificationRoutes); // New route
-
+app.use('/api/admin', adminRoutes); // <--- This now handles /api/admin/system-config
+app.use('/api/plans', planRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/locations', locationRoutes);
+app.use('/api/announcements', announcementRoutes);
+app.use('/api/email-templates', emailTemplateRoutes);
+app.use('/api/system-config', systemConfigRoutes); // Generic public config if needed
 
 // 404 Handler
 app.use('*', (req, res) => {

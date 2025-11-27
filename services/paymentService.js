@@ -26,9 +26,11 @@ class PaymentService {
 
     /**
      * Verify Chapa webhook signature
+     * Updated to accept dynamic secret from controller
      */
-    verifyWebhookSignature(payload, signature) {
-        const webhookSecret = process.env.CHAPA_WEBHOOK_SECRET;
+    verifyWebhookSignature(payload, signature, webhookSecretOverride = null) {
+        // Use override (from DB) if available, otherwise fallback to ENV
+        const webhookSecret = webhookSecretOverride || process.env.CHAPA_WEBHOOK_SECRET;
 
         if (!webhookSecret) {
             throw new Error('CHAPA_WEBHOOK_SECRET not configured');
@@ -137,10 +139,13 @@ class PaymentService {
 
     /**
      * Verify payment with Chapa API (fallback verification)
+     * Updated to accept dynamic secret key
      */
-    async verifyWithChapaAPI(txRef) {
+    async verifyWithChapaAPI(txRef, secretKeyOverride = null) {
         const axios = require('axios');
-        const secretKey = process.env.CHAPA_SECRET_KEY;
+        
+        // Use override (from DB) if available, otherwise fallback to ENV
+        const secretKey = secretKeyOverride || process.env.CHAPA_SECRET_KEY;
 
         if (!secretKey) {
             throw new Error('CHAPA_SECRET_KEY not configured');
